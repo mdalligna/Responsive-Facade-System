@@ -1,0 +1,240 @@
+// Miriam Dall'Igna 20.11.15
+// This sketch receives osc messages from an iPhone 
+// and passes these messages to Arduino
+// to control 12 servos in different modes
+
+// to communicate with phone
+import oscP5.*; 
+import netP5.*; 
+
+// to communicate with arduino
+import processing.serial.*;
+
+// instanciate objects of the library
+OscP5 oscP5;
+NetAddress myRemoteLocation;
+
+// declares communication port
+Serial myPort;
+
+// these are the initial variables for the screens
+int value1 = 30; // spacing angle
+int value2 = 5; // speed in seconds
+int value3 = 180; // maximum aperture
+int value4 = 2000; // delay to oposite motion
+
+// these are the modes the screens can operate on
+float toggle1 = 0.0f; // proximity sensor
+int toggle2 = 0; // light dependent resistor
+int toggle3 = 0; // toggle wave motion
+int toggle4 = 0; // togle sole control for maintenance
+
+// these are the motion types controls;
+int toggleOneSide = 0;
+int toggleTwoSides = 0;
+
+// individual motion for sole control
+int Servo1 = 0;
+int Servo2 = 0;
+int Servo3 = 0;
+int Servo4 = 0;
+int Servo5 = 0;
+int Servo6 = 0;
+int Servo7 = 0;
+int Servo8 = 0;
+int Servo9 = 0;
+int Servo10 = 0;
+int Servo11 = 0;
+int Servo12 = 0;
+
+void setup()
+{
+  // sets the display
+  size(255, 350);  
+  noStroke(); 
+  frameRate(30);  
+  frame.setTitle("Miriam_12ServoControl"); 
+
+  // print parameters to port
+  println(Serial.list());  
+  myPort = new Serial(this, Serial.list()[2], 9600);
+
+  oscP5 = new OscP5(this, 8000); // this device and the incoming port
+  myRemoteLocation = new NetAddress("10.60.210.32", 9000); // input device and the outgoing port
+
+  textSize(16);
+}
+
+void oscEvent(OscMessage theOscMessage)
+{
+  String addr = theOscMessage.addrPattern();
+  // composes the message to be sent
+  // can be hugely improved
+  // set the variables for the screen
+  if (addr.indexOf("/1/spacing") != -1) {
+    value1 = int(theOscMessage.get(0).floatValue());
+    myPort.write(value1 + "a"); 
+    //println("one side: " + v1);
+    println("spacing: " + value1);
+    println("speed: " + value2);
+    println("anglemax: " + value3);
+    println("delay: " + value4);
+  } else if (addr.indexOf("/1/speed") != -1) { 
+    value2 = int(theOscMessage.get(0).floatValue());
+    myPort.write(value2 + "b");
+    //println("one side: " + v1);
+    println("spacing: " + value1);
+    println("speed: " + value2); 
+    println("anglemax: " + value3);
+    println("delay: " + value4);
+  } else if (addr.indexOf("/1/anglemax") != -1) { 
+    value3 = int(theOscMessage.get(0).floatValue());
+    myPort.write(value3 + "c");
+    //println("one side: " + v1);
+    println("spacing: " + value1);
+    println("speed: " + value2);
+    println("anglemax: " + value3);
+    println("delay: " + value4);
+  } else if (addr.indexOf("/1/delay") != -1) { 
+    value4 = int(theOscMessage.get(0).floatValue());
+    myPort.write(value4 + "d");
+    //println("one side: " + v1);
+    println("spacing: " + value1);
+    println("speed: " + value2);
+    println("anglemax: " + value3);
+    println("delay: " + value4);
+  } else if (addr.indexOf("/1/toggle") != -1) { 
+    toggle3 = int(theOscMessage.get(0).floatValue());
+    myPort.write(toggle3 + "e");
+    //println("one side: " + v1);
+    println("spacing: " + value1);
+    println("speed: " + value2);
+    println("anglemax: " + value3);
+    println("delay: " + value4);
+    println("toggle: " + toggle3);
+  } else if (addr.indexOf("/1/one side") != -1) { 
+    toggleOneSide = int(theOscMessage.get(0).floatValue());
+    myPort.write(toggleOneSide + "f");
+    //println("one side: " + v1);
+    println("spacing: " + value1);
+    println("speed: " + value2);
+    println("anglemax: " + value3);
+    println("delay: " + value4);
+    println("toggle: " + toggle3);
+    println("one side: " + toggleOneSide);
+  } else if (addr.indexOf("/1/two sides") != -1) { 
+    toggleTwoSides = int(theOscMessage.get(0).floatValue());
+    myPort.write(toggleTwoSides + "g");
+    //println("one side: " + v1);
+    println("spacing: " + value1);
+    println("speed: " + value2);
+    println("anglemax: " + value3);
+    println("delay: " + value4);
+    println("toggle: " + toggle3);
+    println("one side: " + toggleOneSide);
+    println("two sides: " + toggleTwoSides);
+  } else if (addr.indexOf("/1/sole") != -1) { 
+    toggle4 = int(theOscMessage.get(0).floatValue());
+    myPort.write(toggle4 + "h");
+    //println("one side: " + v1);
+    println("spacing: " + value1);
+    println("speed: " + value2);
+    println("anglemax: " + value3);
+    println("delay: " + value4);
+    println("toggle: " + toggle3);
+    println("one side: " + toggleOneSide);
+    println("two sides: " + toggleTwoSides);
+    println("sole: " + toggle4);
+  } else if (addr.indexOf("/1/servo1") != -1) { 
+    Servo1 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo1 + "i");
+    println("servo1: " + Servo1);
+  } else if (addr.indexOf("/1/servo2") != -1) { 
+    Servo2 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo2 + "j");
+    println("servo2: " + Servo2);
+  } else if (addr.indexOf("/1/servo3") != -1) { 
+    Servo3 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo3 + "k");
+    println("servo3: " + Servo3);
+  } else if (addr.indexOf("/1/servo4") != -1) { 
+    Servo4 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo4 + "l");
+    println("servo4: " + Servo4);
+  } else if (addr.indexOf("/1/servo5") != -1) { 
+    Servo5 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo5 + "m");
+    println("servo5: " + Servo5);
+  } else if (addr.indexOf("/1/servo6") != -1) { 
+    Servo6 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo6 + "n");
+    println("servo6: " + Servo6);
+  } else if (addr.indexOf("/1/servo7") != -1) { 
+    Servo7 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo7 + "o");
+    println("servo7: " + Servo7);
+  } else if (addr.indexOf("/1/servo8") != -1) { 
+    Servo8 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo8 + "p");
+    println("servo8: " + Servo8);
+  } else if (addr.indexOf("/1/servo9") != -1) { 
+    Servo9 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo9 + "q");
+    println("servo9: " + Servo9);
+  } else if (addr.indexOf("/1/Servo10") != -1) { 
+    Servo10 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo10 + "r");
+    println("servo10: " + Servo10);
+  } else if (addr.indexOf("/1/SErvo11") != -1) { 
+    Servo11 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo11 + "s");
+    println("servo11: " + Servo11);
+  } else if (addr.indexOf("/1/SERvo12") != -1) { 
+    Servo12 = int(theOscMessage.get(0).floatValue());
+    myPort.write(Servo12 + "t");
+    println("servo12: " + Servo12);
+  } else if (addr.indexOf("/1/light") != -1) { 
+    toggle2 = int(theOscMessage.get(0).floatValue());
+    myPort.write(toggle2 + "u");
+    println("toggle2: " + toggle2);
+  }
+} // oscEvent(OscMessage theOscMessage)
+
+void draw()
+{
+  // print variables on display
+  background(0);
+  //text(("one side: " + v1), 10, 20); 
+
+  // write on the canvas the screens parameters
+  text(("VARIABLES: " ), 10, 20); 
+  text(("spacing: " + value1), 10, 40); 
+  text(("speed: " + value2), 10, 60); 
+  text(("anglemax: " + value3), 10, 80); 
+  text(("delay: " + value4), 10, 100);
+
+  // write on canvas what mode it is on
+  text(("MODE: " ), 150, 20); 
+  text(("prox: " + toggle1), 150, 40); 
+  text(("light: " + toggle2), 150, 60); 
+  text(("toggle: " + toggle3), 150, 80); 
+  text(("sole: " + toggle4), 150, 100);
+
+  text(("MOTION: " ), 90, 140); 
+  text(("one side: " + toggleOneSide), 10, 160); 
+  text(("two sides: " + toggleTwoSides), 150, 160); 
+
+  text(("INDIVIDUAL SERVO CONTROL: " ), 10, 200); 
+  text(("servo01: " + Servo1), 10, 220); 
+  text(("servo02: " + Servo2), 10, 240);
+  text(("servo03: " + Servo3), 10, 260); 
+  text(("servo04: " + Servo4), 10, 280);
+  text(("servo05: " + Servo5), 10, 300); 
+  text(("servo06: " + Servo6), 10, 320);
+  text(("servo07: " + Servo7), 150, 220); 
+  text(("servo08: " + Servo8), 150, 240); 
+  text(("servo09: " + Servo9), 150, 260); 
+  text(("servo10: " + Servo10), 150, 280); 
+  text(("servo11: " + Servo11), 150, 300); 
+  text(("servo12: " + Servo12), 150, 320);
+}
