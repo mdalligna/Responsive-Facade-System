@@ -1,0 +1,641 @@
+// Miriam Dall'Igna 23/11/15
+
+char val;
+int ledPin = 19; // for testing communication
+
+// servo library and number of servos
+#include <Servo.h>
+#define servoNum 12
+
+// create a list of servo object
+Servo servos[servoNum];
+// creates a list of pins to attach the servos
+int servoPins[] = {
+  2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+};
+
+// initial servo position o
+int pos = 0;
+
+// maximum position the servo can go to - anglemax
+int angle;
+
+//controls the servo speed
+// if reduced the servos will run fast - speed
+int delaySpeed;
+
+// waits to open/close - delay
+int delayToMove;
+
+// blade delay - spacing ngle
+int spiralDelay;
+
+// blade mode
+int proximity = 0;
+int photoresistor;
+int toggle;
+int individiual;
+
+// defines the motion type
+int oneSideMotion;
+int twoSidesMotion;
+
+// servos for individual control
+int servo1;
+int servo2;
+int servo3;
+int servo4;
+int servo5;
+int servo6;
+int servo7;
+int servo8;
+int servo9;
+int servo10;
+int servo11;
+int servo12;
+
+// variables for the photoresistor mode
+// These constants won't change:
+const int sensorPin = A0;    // pin that the sensor is attached to
+const int ledPinSensor = 15;        // pin that the LED is attached to
+
+// set the initial values for minimum and maximum readings
+int sensorMin = 1023; // sets really high value for sensor calibration
+int sensorMax = 0; // sets really low value for sensor calibration
+
+// set inital sensor value
+int sensorValue = 0;
+
+void setup()
+{
+  pinMode(ledPin, OUTPUT);
+  // initialize serial communication:
+  // opens serial port, sets data rate to 9600 bps
+  Serial.begin(9600);
+  // attaches the servo objects to pins on the board
+  // and sends servos to initial position
+  for (int i = 0; i < servoNum; i++)
+  {
+    servos[i].attach(servoPins[i]);
+  } // for(int i = 0; i < servoNum; i++)
+
+  // calibrate photoresistor during first five seconds
+  digitalWrite(ledPin, HIGH); // shine led to show start of calibration period
+  while (millis() < 5000)
+  {
+    sensorValue = analogRead(sensorPin);
+
+    // record the maximum sensor value
+    if (sensorValue > sensorMax)
+    {
+      sensorMax = sensorValue;
+    }
+
+    // record the minimum sensor value
+    if (sensorValue < sensorMin)
+    {
+      sensorMin = sensorValue;
+    }
+  }
+  // signal the end of the calibration period
+  digitalWrite(ledPin, LOW);
+
+}// void setup()
+
+void loop()
+{
+  static int value = 0;
+
+  if (Serial.available() > 0)
+  {
+
+    char message = Serial.read();
+    //Serial.println("message"); // how can I print to serial if the signal is comming on the same po
+
+    switch (message)
+    {
+      // messages received
+      case'0'...'9':
+        value = value * 10 + message - '0';
+        break;
+
+      // spiral spacing angle - frequency
+      case'a':
+        if (value >= 0 && value <= 30) {
+          //int value1 = map(value, 0, 180, 550, 2300);
+          //Servo1.write(value1);
+          spiralDelay = value;
+          value = 0;
+          break;
+        }
+
+      // opening speed
+      case'b':
+
+        if (value >= 1 && value <= 15) {
+          delaySpeed = value;
+          value = 0;
+          break;
+        }
+
+      // maximum aperture
+      case'c':
+
+        if (value >= 90 && value <= 180) {
+          angle = value;
+          value = 0;
+          break;
+        }
+
+      // delay to reverse motion
+      case'd':
+
+        if (value >= 1000 && value <= 3000) {
+          delayToMove = value;
+          value = 0;
+          break;
+        }
+
+      // proximity sensor input mode
+      case'e':
+
+        toggle = value;
+        value = 0;
+        break;
+
+      // user input mode and motion type
+      case'f':
+
+        oneSideMotion = value;
+        value = 0;
+        break;
+        
+      case'g':
+
+        twoSidesMotion = value;
+        value = 0;
+        break;
+
+      case'h':
+
+        individiual = value;
+        value = 0;
+        break;
+        
+      // values for servos in individual mode
+      case'i':
+        if (value >= 0 && value <= 180) {
+          servo1 = value;
+          value = 0;
+          break;
+        }
+
+      case'j':
+        if (value >= 0 && value <= 180) {
+          servo2 = value;
+          value = 0;
+          break;
+        }
+
+      case'k':
+        if (value >= 0 && value <= 180) {
+          servo3 = value;
+          value = 0;
+          break;
+        }
+
+      case'l':
+        if (value >= 0 && value <= 180) {
+          servo4 = value;
+          value = 0;
+          break;
+        }
+
+      case'm':
+        if (value >= 0 && value <= 180) {
+          servo5 = value;
+          value = 0;
+          break;
+        }
+
+      case'n':
+        if (value >= 0 && value <= 180) {
+          servo6 = value;
+          value = 0;
+          break;
+        }
+
+      case'o':
+        if (value >= 0 && value <= 180) {
+          servo7 = value;
+          value = 0;
+          break;
+        }
+
+      case'p':
+        if (value >= 0 && value <= 180) {
+          servo8 = value;
+          value = 0;
+          break;
+        }
+
+      case'q':
+        if (value >= 0 && value <= 180) {
+          servo9 = value;
+          value = 0;
+          break;
+        }
+
+      case'r':
+        if (value >= 0 && value <= 180) {
+          servo10 = value;
+          value = 0;
+          break;
+        }
+
+      case's':
+        if (value >= 0 && value <= 180) {
+          servo11 = value;
+          value = 0;
+          break;
+        }
+
+      case't':
+        if (value >= 0 && value <= 180) {
+          servo12 = value;
+          value = 0;
+          break;
+        }
+
+      // light sensor input mode
+      case'u':
+        photoresistor = value;
+        value = 0;
+        break;
+
+    } // switch
+  } //if (Serial.available() > 0)
+
+
+
+  if (toggle == 1 && oneSideMotion == 1 && twoSidesMotion == 0 && individiual == 0 && photoresistor == 0)
+  {
+    digitalWrite(ledPin, HIGH);
+
+    // reset for mode 1
+    for (int i = 0; i < servoNum; i++)
+    {
+      servos[i].write(pos);
+      delay(delaySpeed);
+    }
+    delay(delayToMove);
+
+    /////////////////////////////////////////////// MODE_1 /////////////////////////////////////////////////////
+    ////////////////////////////////////////////// open  ///////////////////////////////////////////////////////
+
+    for (pos = 0; pos < angle + ((servoNum - 1)*spiralDelay); pos += 1) // goes from 0 degrees to 180 degrees + delay
+    {
+      int i;
+      for (i = 0; i < servoNum; i++)
+      {
+        if (pos >= i * spiralDelay)
+        {
+          servos[i].write(pos - i * spiralDelay);
+          delay(delaySpeed);
+        }
+      }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // waits to close
+    delay(delayToMove);
+
+    //////////////////////////////////////////// close  ///////////////////////////////////////////////////////
+
+    //  reverse the movement
+    // starts motion for the first servo
+    for (pos = angle + ((servoNum - 1) * spiralDelay); pos >= 1; pos -= 1) // goes from 180 degrees + delay to 0 degrees
+    {
+      int i;
+      for (int i = 0; i < servoNum; i++)
+      {
+        if (pos <= (angle + ((servoNum - 1)*spiralDelay)) - i * spiralDelay)
+        {
+          servos[i].write(pos - ((servoNum - (i + 1))*spiralDelay));
+          delay(delaySpeed);
+        }
+      }
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // waits to open
+    delay(delayToMove);
+  }
+
+  else
+  {
+    digitalWrite(ledPin, LOW);
+
+
+  }
+
+
+  if (toggle == 1 && oneSideMotion == 0 && twoSidesMotion == 1 && individiual == 0 && photoresistor == 0)
+  {
+    digitalWrite(ledPin, HIGH);
+
+    // reset for mode 2 (setup)
+    for (int i = 0; i < servoNum; i++)
+    {
+      if (i % 2 == 0)
+      {
+        servos[i].write(pos);
+      }
+      else
+      {
+        servos[i].write(180 - pos);
+      }
+    }
+    delay(delayToMove);
+    ////////////////////////////////////////////// MODE_2 /////////////////////////////////////////////////////
+    ////////////////////////////////////////////// open  ///////////////////////////////////////////////////////
+
+    for (pos = 0; pos < angle + ((servoNum - 1)*spiralDelay); pos += 1) // goes from 0 degrees to 180 degrees + delay
+    {
+      int i;
+      for (i = 0; i < servoNum; i++)
+      {
+        if (pos >= i * spiralDelay)
+        {
+          if (i % 2 == 0)
+          {
+            servos[i].write(pos - i * spiralDelay);
+            //delay(delaySpeed);
+          }
+
+          else
+          {
+            servos[i].write((angle  - pos) + (i * spiralDelay));
+            //delay(delaySpeed/2);
+          }
+        }
+      }
+      delay(delaySpeed);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // waits to close
+    delay(delayToMove);
+
+    //////////////////////////////////////////// close  ///////////////////////////////////////////////////////
+
+    //  reverse the movement
+    // starts motion for the first servo
+
+    for (pos = angle + ((servoNum - 1) * spiralDelay); pos >= 1; pos -= 1) // goes from 180 degrees + delay to 0 degrees
+    {
+      int i;
+      for (int i = 0; i < servoNum; i++)
+      {
+        if (pos <= (angle + ((servoNum - 1)*spiralDelay)) - i * spiralDelay)
+        {
+          if (i % 2 == 0)
+          {
+            servos[i].write(pos - ((servoNum - (i + 1))*spiralDelay));
+            //delay(delaySpeed);
+          }
+          else
+          {
+            servos[i].write(abs(pos - (angle + (((servoNum - (i + 1))*spiralDelay)))));
+            //delay(delaySpeed/2);
+          }
+        }
+      }
+      delay(delaySpeed);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // waits to open
+    delay(delayToMove);
+
+  }
+
+  else
+  {
+    digitalWrite(ledPin, LOW);
+  }
+
+  if (toggle == 0 && oneSideMotion == 0 && twoSidesMotion == 0 && individiual == 1 && photoresistor == 0)
+  {
+    digitalWrite(ledPin, HIGH);
+    servos[0].write(servo1);
+    servos[1].write(servo2);
+    servos[2].write(servo3);
+    servos[3].write(servo4);
+    servos[4].write(servo5);
+    servos[5].write(servo6);
+    servos[6].write(servo7);
+    servos[7].write(servo8);
+    servos[8].write(servo9);
+    servos[9].write(servo10);
+    servos[10].write(servo11);
+    servos[11].write(servo12);
+  }
+
+  else
+  {
+    digitalWrite(ledPin, LOW);
+  }
+
+
+  if (toggle == 0 && oneSideMotion == 1 && twoSidesMotion == 0 && individiual == 0 && photoresistor == 1)
+  {
+    digitalWrite(ledPin, HIGH);
+
+    // read the sensor // read the sensor
+    sensorValue = analogRead(sensorPin);
+
+    // apply the calibration to the sensor reading
+    sensorValue = map(sensorValue, sensorMin, sensorMax, 0, 255);
+
+    // in case the sensor value is outside the range seen during calibration
+    sensorValue = constrain(sensorValue, 0, 255);
+
+    // fade LED during using the calibrated value
+    analogWrite(ledPinSensor, sensorValue);
+
+    if (sensorValue > 100)
+    {
+      // reset for mode 1
+      for (int i = 0; i < servoNum; i++)
+      {
+        servos[i].write(pos);
+        delay(delaySpeed);
+      }
+      delay(delayToMove);
+
+      /////////////////////////////////////////////// MODE_1 /////////////////////////////////////////////////////
+      ////////////////////////////////////////////// open  ///////////////////////////////////////////////////////
+
+      for (pos = 0; pos < angle + ((servoNum - 1)*spiralDelay); pos += 1) // goes from 0 degrees to 180 degrees + delay
+      {
+        int i;
+        for (i = 0; i < servoNum; i++)
+        {
+          if (pos >= i * spiralDelay)
+          {
+            servos[i].write(pos - i * spiralDelay);
+            delay(delaySpeed);
+          }
+        }
+      }
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      // waits to close
+      delay(delayToMove);
+
+      //////////////////////////////////////////// close  ///////////////////////////////////////////////////////
+
+      //  reverse the movement
+      // starts motion for the first servo
+      for (pos = angle + ((servoNum - 1) * spiralDelay); pos >= 1; pos -= 1) // goes from 180 degrees + delay to 0 degrees
+      {
+        int i;
+        for (int i = 0; i < servoNum; i++)
+        {
+          if (pos <= (angle + ((servoNum - 1)*spiralDelay)) - i * spiralDelay)
+          {
+            servos[i].write(pos - ((servoNum - (i + 1))*spiralDelay));
+            delay(delaySpeed);
+          }
+        }
+
+      }
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      // waits to open
+      delay(delayToMove);
+    }
+
+  }
+
+  else
+  {
+    digitalWrite(ledPin, LOW);
+  }
+
+  if (toggle == 0 && oneSideMotion == 0 && twoSidesMotion == 1 && individiual == 0 && photoresistor == 1)
+  {
+    digitalWrite(ledPin, HIGH);
+
+    // read the sensor // read the sensor
+    sensorValue = analogRead(sensorPin);
+
+    // apply the calibration to the sensor reading
+    sensorValue = map(sensorValue, sensorMin, sensorMax, 0, 255);
+
+    // in case the sensor value is outside the range seen during calibration
+    sensorValue = constrain(sensorValue, 0, 255);
+
+    // fade LED during using the calibrated value
+    analogWrite(ledPinSensor, sensorValue);
+
+    if (sensorValue > 100)
+    {
+      // reset for mode 2 (setup)
+      for (int i = 0; i < servoNum; i++)
+      {
+        if (i % 2 == 0)
+        {
+          servos[i].write(pos);
+        }
+        else
+        {
+          servos[i].write(180 - pos);
+        }
+      }
+      delay(delayToMove);
+      ////////////////////////////////////////////// MODE_2 /////////////////////////////////////////////////////
+      ////////////////////////////////////////////// open  ///////////////////////////////////////////////////////
+
+      for (pos = 0; pos < angle + ((servoNum - 1)*spiralDelay); pos += 1) // goes from 0 degrees to 180 degrees + delay
+      {
+        int i;
+        for (i = 0; i < servoNum; i++)
+        {
+          if (pos >= i * spiralDelay)
+          {
+            if (i % 2 == 0)
+            {
+              servos[i].write(pos - i * spiralDelay);
+              //delay(delaySpeed);
+            }
+
+            else
+            {
+              servos[i].write((angle  - pos) + (i * spiralDelay));
+              //delay(delaySpeed/2);
+            }
+          }
+        }
+        delay(delaySpeed);
+      }
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      // waits to close
+      delay(delayToMove);
+
+      //////////////////////////////////////////// close  ///////////////////////////////////////////////////////
+
+      //  reverse the movement
+      // starts motion for the first servo
+
+      for (pos = angle + ((servoNum - 1) * spiralDelay); pos >= 1; pos -= 1) // goes from 180 degrees + delay to 0 degrees
+      {
+        int i;
+        for (int i = 0; i < servoNum; i++)
+        {
+          if (pos <= (angle + ((servoNum - 1)*spiralDelay)) - i * spiralDelay)
+          {
+            if (i % 2 == 0)
+            {
+              servos[i].write(pos - ((servoNum - (i + 1))*spiralDelay));
+              //delay(delaySpeed);
+            }
+            else
+            {
+              servos[i].write(abs(pos - (angle + (((servoNum - (i + 1))*spiralDelay)))));
+              //delay(delaySpeed/2);
+            }
+          }
+        }
+        delay(delaySpeed);
+      }
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      // waits to open
+      delay(delayToMove);
+
+    }
+
+  }
+
+  else
+  {
+    digitalWrite(ledPin, LOW);
+  }
+
+
+} // void loop
+
+
+
